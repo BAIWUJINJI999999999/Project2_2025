@@ -7,9 +7,9 @@ GPIO.setup(channel,GPIO.IN)
 
 def callback(channel):
         if GPIO.input(channel):
-                print("Water Detected!")
-        else:
                 print("No Water Detected!")
+        else:
+                print("Water Detected!")
 
 GPIO.add_event_detect(channel,GPIO.BOTH,bouncetime=300)
 GPIO.add_event_callback(channel,callback)
@@ -21,3 +21,5 @@ try:
         else:
             print("Soil is dry")
         time.sleep(10800)
+except KeyboardInterrupt:
+    GPIO.cleanup()

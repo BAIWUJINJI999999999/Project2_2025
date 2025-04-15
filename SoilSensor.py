@@ -14,5 +14,10 @@ def callback(channel):
 GPIO.add_event_detect(channel,GPIO.BOTH,bouncetime=300)
 GPIO.add_event_callback(channel,callback)
 
-while True:
-        time.sleep(0)
+try:
+    while True:
+        if GPIO.input(channel):
+            print("Soil is wet")
+        else:
+            print("Soil is dry")
+        time.sleep(10800)

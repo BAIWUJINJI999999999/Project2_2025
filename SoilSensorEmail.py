@@ -7,34 +7,59 @@ channel = 4
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(channel,GPIO.IN)
 
-sensor_readings = []
+from_email_addr="BAIWUJINJI999999@163.com"
+from_email_pass="QGLmD7GAbyYEH8XJ"
+to_email_addr="BAIWUJINJI999999@163.com"
 
-def get_sensor_reading():
-    return GPIO.input(channel)
+last_send_time = 0
 
-def send_email_report(max_reading,min_reading):
-    from_email_addr="BAIWUJINJI999999@163.com"
-    from_email_pass="QGLmD7GAbyYEH8XJ"
-    to_email_addr="BAIWUJINJI999999@163.com"
+def callback(channel):
 
-    msg = EmailMessage()
-    body = f"Max Moisture Reading: {max_reading},Min Moisture Reading: {min_reading}"
-    msg.set_content(body)
-    msg['From'] = from_email_addr
-    msg['To'] = to_email_addr
-    msg['Subject'] = "Daily Moisture Report"
+    if GPIO.input(channel)
+        print("Water Detected!")
+    else:
+        print("No Water Detected!")
 
-    server = smtplib.SMTP('smtp.163.com', 25)
-    server.starttls()
-    server.login(from_email_addr,from_email_pass)
-    server.send_message(msg)
-    server.quit()
+GPIO.add_event_detect(channel,GPIO.BOTH,bouncetime = 300)
+GPIO.add_event_callback(channel,callback)
 
-for _ in range(8):
-    reading = get_sensor_reading()
-    sensor_readings.append(reading)
-    time.sleep(10800)
+def send_email(subject,body):
+    global last_send_time
+    current_time = time.time()
 
-max_reading = max(sensor_reading)
-min_reading = min(sensor_reading)
-send_email_report(max_reading,min_reading)
+    if current_time - last_send_time >= 6*60*60:
+        server = smtplib.SMTP('smtp.163.com', 25)
+        server.starttls()
+        server.login(from_email_addr,from_email_pass)
+
+        msg = EmailMessage()
+        msg.set_content(body)
+        msg['From'] = from_email_addr
+        msg['To'] = to_email_addr
+        msg['Subject'] = subject
+
+        server.send_message(msg)
+        server.quit()
+        print("Email Sent!")
+        last_send_time = current_time
+
+    else:
+       print("Time interval not reached,email not sent")
+
+def main():
+    while True:
+        current_time = time.localtime()
+        current_hour = current_time.tm_hour 
+        print("current time hour: ",current_hour)
+
+        time.sleep(60*60)
+
+        if current_hour % 6 == 0:
+            current_value = GPIO.input(channel)
+            status = "water detected"if current_value else "water not detected"
+            subject = "soil sensor update"
+            body =f"The soil sensor status is: {status}"
+            send_email(subject,body)
+
+if __name__== "__main__":
+    main()

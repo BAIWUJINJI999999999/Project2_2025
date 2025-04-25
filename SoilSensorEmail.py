@@ -15,7 +15,7 @@ last_send_time = 0
 
 def callback(channel):
 
-    if GPIO.input(channel)
+    if GPIO.input(channel): 
         print("Water Detected!")
     else:
         print("No Water Detected!")
